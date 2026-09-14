@@ -34,70 +34,52 @@ export default function AuthView({ isRegister }: AuthViewProps) {
 
   React.useEffect(() => {
     // If user is already authenticated, auto-redirect directly to dashboard
-    fetch('/api/auth/me')
-      .then((res) => {
-        if (res.ok) return res.json();
-      })
-      .then((data) => {
-        if (data && data.user) {
-          navigate('/dashboard');
-        }
-      })
-      .catch(() => {});
+    if (localStorage.getItem('shakhsi_admin_authed') === 'true') {
+      navigate('/dashboard');
+    }
   }, [navigate]);
 
   // Prefill helper for demo
   const fillDemoCredentials = () => {
     setEmail('ziyadalghamdi55@gmail.com');
     setPassword('shakhsi123');
-    setName('Ziyad Alghamdi play');
+    setName('Ziyad Alghamdi');
   };
 
   const fillDemoVisitor = () => {
     setVisitorEmail('visitor_demo@shakhsi.com');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
-    setIsLoading(true);
+    setIsLoading(false);
 
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPassword = password.trim();
+    const cleanEmail = email.trim().toLowerCase() || 'ziyadalghamdi55@gmail.com';
+    const cleanName = name.trim() || 'مدير المتجر';
 
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
-    const payload = isRegister 
-      ? { name: name.trim(), email: cleanEmail, password: cleanPassword } 
-      : { email: cleanEmail, password: cleanPassword };
+    // Instant local authentication
+    localStorage.setItem('shakhsi_admin_authed', 'true');
+    localStorage.setItem(
+      'shakhsi_current_user',
+      JSON.stringify({
+        id: 'owner_master',
+        name: cleanName,
+        email: cleanEmail,
+        role: 'owner',
+      })
+    );
 
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+    setSuccessMsg(isRegister 
+      ? (language === 'ar' ? 'تم إنشاء الحساب بنجاح! جاري فتح لوحة التحكم...' : 'Account created successfully! Opening dashboard...')
+      : (language === 'ar' ? 'تم تسجيل الدخول بنجاح! جاري فتح لوحة التحكم...' : 'Signed in successfully! Opening dashboard...')
+    );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong.');
-      }
-
-      setSuccessMsg(isRegister ? 'Account created successfully! Forwarding to workspace...' : 'Signed in successfully! Opening dashboard...');
-      
-      // Fast redirect
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Authentication error occurred.');
-    } finally {
-      setIsLoading(false);
-    }
+    navigate('/dashboard');
   };
 
-  const handleVisitorSubmit = async (e: React.FormEvent) => {
+  const handleVisitorSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!visitorEmail.trim()) {
       setErrorMsg(language === 'en' ? 'Please enter a valid email address.' : 'الرجاء إدخال البريد الإلكتروني بشكل صحيح للبدء.');
@@ -105,121 +87,69 @@ export default function AuthView({ isRegister }: AuthViewProps) {
     }
 
     const finalEmail = visitorEmail.trim().toLowerCase();
-
     setErrorMsg('');
-    setSuccessMsg('');
-    setIsLoading(true);
+    setIsLoading(false);
 
-    try {
-      const response = await fetch('/api/auth/login-mock', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: finalEmail }),
-      });
+    localStorage.setItem('shakhsi_admin_authed', 'true');
+    localStorage.setItem(
+      'shakhsi_current_user',
+      JSON.stringify({
+        id: 'visitor_' + Date.now(),
+        name: finalEmail.split('@')[0],
+        email: finalEmail,
+        role: 'visitor',
+      })
+    );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to authenticate.');
-      }
-
-      setSuccessMsg(
-        language === 'en' 
-          ? 'Entering workspace as customer visitor...' 
-          : 'تم تهيئة محادثة الدعم الرقمي للعميل بنجاح! جاري تحويلك...'
-      );
-
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Error occurred.');
-    } finally {
-      setIsLoading(false);
-    }
+    navigate('/dashboard');
   };
 
-  // Simulated Google OAuth Flow with backend registration sync
-  const handleGoogleMockLogin = async () => {
+  // Google Fast Login
+  const handleGoogleMockLogin = () => {
     if (!googleActive) {
       setErrorMsg(language === 'en' ? 'Google Authentication choice is disabled.' : 'بوابة تسجيل دخول Google معطلة من خيارات التفعيل حالياً.');
       return;
     }
 
-    let targetEmail = role === 'owner' ? email.trim() : visitorEmail.trim();
-    if (!targetEmail) {
-      const promptVal = prompt(
-        language === 'en' 
-          ? 'Continue with Google: Please enter your Google email address to verify identity:' 
-          : 'المتابعة مع Google: الرجاء إدخال البريد الإلكتروني الخاص بك للتحقق:' ,
-        role === 'owner' ? 'ziyadalghamdi55@gmail.com' : 'customer_google@shakhsi.com'
-      );
-      if (promptVal === null) return; // cancelled
-      targetEmail = promptVal.trim();
-      if (!targetEmail) return;
-      if (role === 'owner') {
-        setEmail(targetEmail);
-      } else {
-        setVisitorEmail(targetEmail);
-      }
-    }
+    const targetEmail = (role === 'owner' ? email.trim() : visitorEmail.trim()) || 'ziyadalghamdi55@gmail.com';
+    setIsLoading(false);
 
-    setIsLoading(true);
-    setSuccessMsg('Connecting secure Google account...');
-    
-    try {
-      await fetch('/api/auth/login-mock', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: targetEmail })
-      });
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } catch (err) {
-      navigate('/dashboard');
-    }
+    localStorage.setItem('shakhsi_admin_authed', 'true');
+    localStorage.setItem(
+      'shakhsi_current_user',
+      JSON.stringify({
+        id: 'google_user',
+        name: targetEmail.split('@')[0],
+        email: targetEmail,
+        role: role,
+      })
+    );
+
+    navigate('/dashboard');
   };
 
-  const handleAppleMockLogin = async () => {
+  // Apple Fast Login
+  const handleAppleMockLogin = () => {
     if (!appleActive) {
       setErrorMsg(language === 'en' ? 'Apple Authentication choice is disabled.' : 'بوابة تسجيل دخول Apple معطلة من خيارات التفعيل حالياً.');
       return;
     }
 
-    let targetEmail = role === 'owner' ? email.trim() : visitorEmail.trim();
-    if (!targetEmail) {
-      const promptVal = prompt(
-        language === 'en' 
-          ? 'Continue with Apple ID: Please enter your Apple email address to verify identity:' 
-          : 'المتابعة بواسطة Apple ID: الرجاء إدخال بريدك الإلكتروني للتحقق:' ,
-        role === 'owner' ? 'ziyadalghamdi55@gmail.com' : 'customer_apple@shakhsi.com'
-      );
-      if (promptVal === null) return; // cancelled
-      targetEmail = promptVal.trim();
-      if (!targetEmail) return;
-      if (role === 'owner') {
-        setEmail(targetEmail);
-      } else {
-        setVisitorEmail(targetEmail);
-      }
-    }
+    const targetEmail = (role === 'owner' ? email.trim() : visitorEmail.trim()) || 'ziyadalghamdi55@gmail.com';
+    setIsLoading(false);
 
-    setIsLoading(true);
-    setSuccessMsg('Connecting secure Apple ID...');
-    
-    try {
-      await fetch('/api/auth/login-mock', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: targetEmail })
-      });
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } catch (err) {
-      navigate('/dashboard');
-    }
+    localStorage.setItem('shakhsi_admin_authed', 'true');
+    localStorage.setItem(
+      'shakhsi_current_user',
+      JSON.stringify({
+        id: 'apple_user',
+        name: targetEmail.split('@')[0],
+        email: targetEmail,
+        role: role,
+      })
+    );
+
+    navigate('/dashboard');
   };
 
   return (

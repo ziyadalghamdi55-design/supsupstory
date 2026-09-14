@@ -1835,7 +1835,7 @@ app.get('/api/store/orders/:orderId/email-preview', (req, res) => {
   };
 
   const activeWs = getActiveWorkspace();
-  const html = generateOrderConfirmationEmailHtml(order, product, activeWs.bot_name || 'Shakhsi Digital Store');
+  const html = generateOrderConfirmationEmailHtml(order, product, { storeName: activeWs.bot_name || 'Shakhsi Digital Store' });
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);

@@ -36,12 +36,18 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeUser, setActiveUser] = useState<any>(null);
+  const [activeUser, setActiveUser] = useState<any>(() => {
+    const raw = localStorage.getItem('shakhsi_current_user');
+    if (raw) {
+      try { return JSON.parse(raw); } catch (e) {}
+    }
+    return { id: 'owner_master', name: 'مدير المتجر', email: 'admin@shakhsi.com', role: 'owner' };
+  });
   const [activeWorkspace, setActiveWorkspace] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isOwner, setIsOwner] = useState<boolean>(true);
   const [customerThread, setCustomerThread] = useState<any>(null);
-  const [loadingMe, setLoadingMe] = useState(true);
+  const [loadingMe, setLoadingMe] = useState(false);
   const [isAdminUnlocked, setIsAdminUnlocked] = useState<boolean>(() => {
     return localStorage.getItem('shakhsi_admin_authed') === 'true';
   });
@@ -63,35 +69,34 @@ export default function DashboardLayout() {
   };
 
   const checkAuth = () => {
-    // Check if session authenticated
-    fetch('/api/auth/me')
-      .then((res) => {
-        if (!res.ok) throw new Error();
-        return res.json();
+    // 100% Client-side authentication check
+    const isAuthed = localStorage.getItem('shakhsi_admin_authed') === 'true';
+    if (isAuthed) {
+      setIsAdminUnlocked(true);
+    }
+    const raw = localStorage.getItem('shakhsi_current_user');
+    let localUser = {
+      id: 'owner_master',
+      name: 'مدير المتجر',
+      email: 'ziyadalghamdi55@gmail.com',
+      role: 'owner',
+    };
+    if (raw) {
+      try {
+        localUser = { ...localUser, ...JSON.parse(raw) };
+      } catch (e) {}
+    }
+    setActiveUser(localUser);
+    setIsOwner(true);
+    setLoadingMe(false);
+
+    // Asynchronously fetch workspace configs without blocking or gating auth
+    fetch('/api/workspace')
+      .then((r) => r.json())
+      .then((ws) => {
+        if (ws && ws.name) setActiveWorkspace(ws);
       })
-      .then((data) => {
-        if (data.user) {
-          setActiveUser(data.user);
-          setIsOwner(data.isOwner);
-          setCustomerThread(data.customerThread);
-          
-          // Fetch associated workspace
-          fetch('/api/workspace')
-            .then(r => r.json())
-            .then(ws => {
-              setActiveWorkspace(ws);
-              setLoadingMe(false);
-            })
-            .catch(() => {
-              setLoadingMe(false);
-            });
-        } else {
-          setLoadingMe(false);
-        }
-      })
-      .catch(() => {
-        setLoadingMe(false);
-      });
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -155,15 +160,11 @@ export default function DashboardLayout() {
     }
   }, [incomingAlert]);
 
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem('shakhsi_admin_authed');
-      setIsAdminUnlocked(false);
-      await fetch('/api/auth/logout', { method: 'POST' });
-      navigate('/');
-    } catch (err) {
-      navigate('/');
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('shakhsi_admin_authed');
+    localStorage.removeItem('shakhsi_current_user');
+    setIsAdminUnlocked(false);
+    navigate('/');
   };
 
   if (loadingMe) {

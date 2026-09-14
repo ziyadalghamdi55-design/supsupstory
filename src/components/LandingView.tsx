@@ -28,15 +28,10 @@ export default function LandingView() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user session already exists
-    fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(data => {
-        if (data.user) {
-          setIsAuthenticated(true);
-        }
-      })
-      .catch(() => {});
+    // Check if user session already exists locally
+    if (localStorage.getItem('shakhsi_admin_authed') === 'true') {
+      setIsAuthenticated(true);
+    }
   }, []);
 
   return (

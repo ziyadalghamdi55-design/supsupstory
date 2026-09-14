@@ -56,9 +56,12 @@ export interface StockAlertSubscriber {
   id: string;
   product_id: string;
   product_name: string;
-  email: string;
+  email?: string;
+  customer_email?: string;
+  status?: string;
   created_at: string;
   notified?: boolean;
+  notified_at?: string;
 }
 
 export interface StoreReview {
@@ -163,6 +166,7 @@ export interface StoreOrder {
   // Cross-sell item if purchased together
   cross_sell_product_id?: string;
   cross_sell_product_name?: string;
+  cross_sell_amount?: number;
   cross_sell_license_code?: string;
   activation_guide?: string;
   activation_guide_ar?: string;
