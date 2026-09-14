@@ -209,11 +209,18 @@ export default function CustomerSelfServiceTrackView() {
                           {order.product_name}
                         </h3>
                       </div>
-                      <div className="text-xs text-slate-400">
-                        {new Date(order.created_at).toLocaleDateString(
-                          language === 'ar' ? 'ar-SA' : 'en-US',
-                          { month: 'short', day: 'numeric', year: 'numeric' }
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        {order.amount !== undefined && (
+                          <span className="font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2.5 py-0.5 rounded-lg text-xs font-mono">
+                            {order.amount} {order.currency || 'SAR'}
+                          </span>
                         )}
+                        <span>
+                          {new Date(order.created_at).toLocaleDateString(
+                            language === 'ar' ? 'ar-SA' : 'en-US',
+                            { month: 'short', day: 'numeric', year: 'numeric' }
+                          )}
+                        </span>
                       </div>
                     </div>
 

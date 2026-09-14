@@ -222,6 +222,8 @@ export default function StorefrontView() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <CurrencySwitcher variant="light" className="hidden sm:inline-block" />
+
             <Link
               to="/track"
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-300/80 text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 text-xs font-bold transition shadow-2xs cursor-pointer"

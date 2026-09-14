@@ -8,6 +8,7 @@ import { useBilingual } from '../BilingualContext';
 import { useCurrency } from '../CurrencyContext';
 import { StoreProduct, StoreOrder } from '../types';
 import TroubleshootTicketModal from './TroubleshootTicketModal';
+import CurrencySwitcher from './CurrencySwitcher';
 import { 
   X, 
   CheckCircle2, 
@@ -342,13 +343,16 @@ export default function CheckoutModal({ product, onClose, onOrderCompleted }: Ch
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <CurrencySwitcher compact />
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}

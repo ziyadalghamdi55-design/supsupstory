@@ -41,7 +41,7 @@ export interface Workspace {
   analytics_id?: string; // معرف تتبع التحليلات e.g. G-XXXXXXX or Meta Pixel
 }
 
-export type CurrencyCode = 'SAR' | 'USD' | 'AED';
+export type CurrencyCode = 'SAR' | 'AED' | 'KWD' | 'QAR' | 'BHD' | 'OMR' | 'USD';
 
 export interface CurrencyConfig {
   code: CurrencyCode;
@@ -49,7 +49,10 @@ export interface CurrencyConfig {
   name_en: string;
   symbol_ar: string;
   symbol_en: string;
-  rate: number; // relative to SAR (1 SAR = 1 SAR, 0.27 USD, 0.98 AED)
+  rate: number; // relative to SAR base (1 SAR = 1 SAR)
+  flag?: string;
+  country_ar?: string;
+  country_en?: string;
 }
 
 export interface StockAlertSubscriber {
