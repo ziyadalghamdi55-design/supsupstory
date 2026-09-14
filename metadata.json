@@ -1,0 +1,6 @@
+{
+  "name": "منصة شخصي | Shakhsi Platform",
+  "description": "منصة التجارة والتسليم الآلي الفوري للتراخيص والاشتراكات الرقمية - Fast Digital License Deliveries",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

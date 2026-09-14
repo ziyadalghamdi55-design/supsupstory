@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>منصة شخصي | Shakhsi Platform</title>
+    <meta name="title" content="منصة شخصي | Shakhsi Platform" />
+    <meta name="description" content="منصة التجارة والتسليم الآلي الفوري للتراخيص والاشتراكات الرقمية - Fast Digital License Deliveries" />
+    <meta name="keywords" content="اشتراكات رقمية, مفاتيح تفعيل, شات جي بي تي بلس, ويندوز 11, ستيم, تسليم فوري, شخصي" />
+    <meta name="author" content="Shakhsi Platform" />
+    <meta name="theme-color" content="#090d16" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://shakhsi.com/" />
+    <meta property="og:title" content="منصة شخصي | Shakhsi Platform" />
+    <meta property="og:description" content="منصة التجارة والتسليم الآلي الفوري للتراخيص والاشتراكات الرقمية - Fast Digital License Deliveries" />
+    <meta property="og:image" content="/og-preview.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="منصة شخصي | Shakhsi Platform" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="منصة شخصي | Shakhsi Platform" />
+    <meta name="twitter:description" content="منصة التجارة والتسليم الآلي الفوري للتراخيص والاشتراكات الرقمية - Fast Digital License Deliveries" />
+    <meta name="twitter:image" content="/og-preview.png" />
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="شخصي Shakhsi" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Register Service Worker for PWA if supported
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>
+
